@@ -1,2 +1,22 @@
 datasets/dataset_v0.json
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+
+# Logs
+*.log
+
+# OS / IDE
 .DS_Store
+Thumbs.db
+.vscode/settings.json
+
+# Local env files
+.env
