@@ -4,7 +4,7 @@ param(
     [string]$Command
 )
 
-$PYTHON = "C:\Users\cesar\AppData\Local\Programs\Python\Python312\python.exe"
+$python = "C:\Python312\python.exe"
 
 if (!(Test-Path $PYTHON)) {
     Write-Host "Python introuvable : $PYTHON" -ForegroundColor Red
