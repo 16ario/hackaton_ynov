@@ -26,7 +26,7 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 ## 📊 DATA
 
-- [ ] Analyser les datasets hérités (`datasets/`) — formats, volume, anomalies
+- [x] Analyser les datasets hérités (`datasets/`) — formats, volume, anomalies
 - [ ] Identifier ce qui est utilisable et ce qui ne l'est pas
 - [ ] Écrire un script Python d'analyse et de nettoyage
 - [ ] Préparer le dataset médical pour l'équipe IA
@@ -37,8 +37,9 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 - [x] Auditer tout ce que l'équipe précédente a laissé (code, logs, données)
 - [x] Identifier les problèmes de sécurité, évaluer leur criticité
-- [ ] Tester la robustesse du modèle (prompt injection, données sensibles...)
-- [ ] Rédiger un rapport : findings + preuves + recommandations
+- [x] Tester la robustesse du modèle (prompt injection, données sensibles...)
+- [x] Rédiger un rapport : findings + preuves + recommandations
+à vérifier avec thomas
 
 ---
 
@@ -48,7 +49,7 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 - [x] Se connecter au serveur déployé par l'INFRA (`http://localhost:11434`)
 - [x] Afficher l'historique de la conversation
 - [x] Montrer l'état de connexion au serveur (connecté / déconnecté)
-- [x] La lancer en une commande depuis `rendu/devweb/`
+- [] La lancer en une commande depuis `rendu/devweb/`
 
 ---
 

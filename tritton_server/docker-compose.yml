@@ -15,6 +15,7 @@ services:
     command: >
       tritonserver
       --model-repository=/models
-      --strict-model-config=false
+      --model-control-mode=explicit
+      --strict-readiness=false
       --log-verbose=1
     restart: unless-stopped
