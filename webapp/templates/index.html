@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechCorp AI Chat</title>
+
+    <style>
+        :root {
+            --bg-main: #080f1f;
+            --bg-panel: rgba(15, 23, 42, 0.92);
+            --bg-card: #111827;
+            --bg-input: #0b1220;
+            --border-soft: rgba(148, 163, 184, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-strong: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --assistant: #1e293b;
+            --user: linear-gradient(135deg, #2563eb, #38bdf8);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.18), transparent 30%),
+                var(--bg-main);
+            color: var(--text-main);
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1120px;
+            height: 82vh;
+            min-height: 680px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-soft);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(18px);
+        }
+
+        .sidebar {
+            padding: 28px;
+            background: rgba(2, 6, 23, 0.58);
+            border-right: 1px solid var(--border-soft);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #020617;
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.25);
+        }
+
+        .brand-text strong {
+            display: block;
+            font-size: 18px;
+        }
+
+        .brand-text span {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .status-card {
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-soft);
+            margin-bottom: 18px;
+        }
+
+        .status-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .dot.error {
+            background: var(--danger);
+            box-shadow: 0 0 10px var(--danger);
+        }
+
+        .meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .quick-title {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 24px 0 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .quick-btn {
+            width: 100%;
+            text-align: left;
+            padding: 11px 12px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: rgba(15, 23, 42, 0.78);
+            color: #dbeafe;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            font-size: 13px;
+        }
+
+        .quick-btn:hover {
+            border-color: rgba(56, 189, 248, 0.55);
+            transform: translateY(-1px);
+        }
+
+        .sidebar-footer {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .topbar {
+            padding: 26px 32px 18px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+            letter-spacing: -0.03em;
+        }
+
+        .topbar p {
+            margin: 8px 0 0;
+            color: var(--text-muted);
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .badge {
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.24);
+            color: #bae6fd;
+            font-size: 12px;
+        }
+
+        .chat {
+            flex: 1;
+            padding: 26px 32px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .message-row {
+            display: flex;
+            margin-bottom: 18px;
+        }
+
+        .message-row.user-row {
+            justify-content: flex-end;
+        }
+
+        .bubble {
+            max-width: min(720px, 82%);
+            padding: 15px 17px;
+            border-radius: 18px;
+            line-height: 1.55;
+            font-size: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .assistant-bubble {
+            background: var(--assistant);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-top-left-radius: 6px;
+        }
+
+        .user-bubble {
+            background: var(--user);
+            color: white;
+            border-top-right-radius: 6px;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
+        }
+
+        .sender {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .composer {
+            padding: 18px 32px 26px;
+            border-top: 1px solid var(--border-soft);
+            background: rgba(2, 6, 23, 0.35);
+        }
+
+        .input-box {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            padding: 12px;
+            background: var(--bg-input);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 18px;
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+            height: 48px;
+            max-height: 140px;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 15px;
+            line-height: 1.4;
+            padding: 12px;
+        }
+
+        textarea::placeholder {
+            color: #64748b;
+        }
+
+        button.send {
+            min-width: 112px;
+            height: 48px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+
+        button.send:hover {
+            transform: translateY(-1px);
+        }
+
+        button.send:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .typing {
+            display: inline-flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .typing span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: bounce 1s infinite ease-in-out;
+        }
+
+        .typing span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .typing span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.6);
+                opacity: 0.45;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .page {
+                padding: 14px;
+            }
+
+            .app {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: 92vh;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .topbar, .chat, .composer {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .bubble {
+                max-width: 92%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="app">
+            <aside class="sidebar">
+                <div>
+                    <div class="brand">
+                        <div class="logo">TC</div>
+                        <div class="brand-text">
+                            <strong>TechCorp AI</strong>
+                            <span>Financial Assistant</span>
+                        </div>
+                    </div>
+
+                    <div class="status-card">
+                        <div class="status-line">
+                            <span id="statusDot" class="dot"></span>
+                            <strong id="statusText">Connexion en cours...</strong>
+                        </div>
+                        <div class="meta">
+                            Modèle : techcorp-phi-financial<br>
+                            Backend : Flask<br>
+                            Inférence : Ollama
+                        </div>
+                    </div>
+
+                    <div class="quick-title">Questions rapides</div>
+                    <button class="quick-btn" onclick="usePrompt('Explique la différence entre chiffre d\\'affaires, bénéfice net et marge.')">
+                        Chiffre d’affaires, bénéfice, marge
+                    </button>
+                    <button class="quick-btn" onclick="usePrompt('Analyse les risques financiers d\\'une entreprise très endettée.')">
+                        Risques d’une entreprise endettée
+                    </button>
+                    <button class="quick-btn" onclick="usePrompt('Explique ce qu\\'est une marge brute avec un exemple simple.')">
+                        Marge brute avec exemple
+                    </button>
+                    <button class="quick-btn" onclick="usePrompt('Donne-moi le cours exact de l\\'action Apple aujourd\\'hui.')">
+                        Test données temps réel
+                    </button>
+                </div>
+
+                <div class="sidebar-footer">
+                    Projet TechCorp — Challenge IA<br>
+                    Interface de démonstration locale.
+                </div>
+            </aside>
+
+            <main class="main">
+                <header class="topbar">
+                    <h1>TechCorp AI Chat</h1>
+                    <p>Assistant financier connecté au serveur d’inférence Ollama.</p>
+                    <div class="badges">
+                        <span class="badge">Ollama API : localhost:11434</span>
+                        <span class="badge">Flask : localhost:5000</span>
+                        <span class="badge">Mode : démonstration</span>
+                    </div>
+                </header>
+
+                <section id="chat" class="chat">
+                    <div class="message-row">
+                        <div>
+                            <div class="sender">TechCorp Phi-Financial</div>
+                            <div class="bubble assistant-bubble">
+Bonjour, je suis l’assistant financier TechCorp.
+
+Je peux vous aider à expliquer des notions financières, analyser des risques business ou clarifier des concepts de budget, marge, dette et rentabilité.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <footer class="composer">
+                    <div class="input-box">
+                        <textarea id="messageInput" placeholder="Posez une question financière..."></textarea>
+                        <button id="sendButton" class="send" onclick="sendMessage()">Envoyer</button>
+                    </div>
+                    <div class="hint">Entrée pour envoyer · Shift + Entrée pour aller à la ligne</div>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const chat = document.getElementById("chat");
+        const input = document.getElementById("messageInput");
+        const button = document.getElementById("sendButton");
+        const statusDot = document.getElementById("statusDot");
+        const statusText = document.getElementById("statusText");
+
+        async function checkHealth() {
+            try {
+                const response = await fetch("/health");
+                const data = await response.json();
+
+                if (data.ollama_available) {
+                    statusDot.classList.remove("error");
+                    statusText.textContent = "Système opérationnel";
+                } else {
+                    statusDot.classList.add("error");
+                    statusText.textContent = "Ollama indisponible";
+                }
+            } catch (error) {
+                statusDot.classList.add("error");
+                statusText.textContent = "Backend indisponible";
+            }
+        }
+
+        function usePrompt(text) {
+            input.value = text;
+            input.focus();
+        }
+
+        function addMessage(content, type) {
+            const row = document.createElement("div");
+            row.className = "message-row" + (type === "user" ? " user-row" : "");
+
+            const wrapper = document.createElement("div");
+
+            const sender = document.createElement("div");
+            sender.className = "sender";
+            sender.textContent = type === "user" ? "Vous" : "TechCorp Phi-Financial";
+
+            const bubble = document.createElement("div");
+            bubble.className = "bubble " + (type === "user" ? "user-bubble" : "assistant-bubble");
+            bubble.textContent = content;
+
+            wrapper.appendChild(sender);
+            wrapper.appendChild(bubble);
+            row.appendChild(wrapper);
+            chat.appendChild(row);
+            chat.scrollTop = chat.scrollHeight;
+
+            return bubble;
+        }
+
+        function addTypingMessage() {
+            const row = document.createElement("div");
+            row.className = "message-row";
+
+            const wrapper = document.createElement("div");
+
+            const sender = document.createElement("div");
+            sender.className = "sender";
+            sender.textContent = "TechCorp Phi-Financial";
+
+            const bubble = document.createElement("div");
+            bubble.className = "bubble assistant-bubble";
+            bubble.innerHTML = '<span class="typing"><span></span><span></span><span></span></span>';
+
+            wrapper.appendChild(sender);
+            wrapper.appendChild(bubble);
+            row.appendChild(wrapper);
+            chat.appendChild(row);
+            chat.scrollTop = chat.scrollHeight;
+
+            return bubble;
+        }
+
+        async function sendMessage() {
+            const message = input.value.trim();
+
+            if (!message) {
+                return;
+            }
+
+            addMessage(message, "user");
+            input.value = "";
+            button.disabled = true;
+
+            const loadingBubble = addTypingMessage();
+
+            try {
+                const response = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                if (data.answer) {
+                    loadingBubble.textContent = data.answer;
+                } else {
+                    loadingBubble.textContent = data.error || "Erreur inconnue.";
+                    loadingBubble.style.background = "#7f1d1d";
+                }
+            } catch (error) {
+                loadingBubble.textContent = "Erreur : impossible de contacter le backend Flask.";
+                loadingBubble.style.background = "#7f1d1d";
+            }
+
+            button.disabled = false;
+            input.focus();
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        input.addEventListener("input", function () {
+            input.style.height = "48px";
+            input.style.height = Math.min(input.scrollHeight, 140) + "px";
+        });
+
+        input.addEventListener("keydown", function (event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        checkHealth();
+    </script>
+</body>
+</html>
