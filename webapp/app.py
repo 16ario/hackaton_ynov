@@ -16,19 +16,51 @@ def index():
 @app.route("/api/chat", methods=["POST"])
 def chat():
     data = request.get_json() or {}
-    user_message = data.get("message", "").strip()
 
-    if not user_message:
-        return jsonify({"error": "Message vide."}), 400
+    messages = data.get("messages")
 
-    payload = {
-        "model": MODEL_NAME,
-        "messages": [
+    if not messages:
+        user_message = data.get("message", "").strip()
+        if not user_message:
+            return jsonify({"error": "Message vide."}), 400
+
+        messages = [
             {
                 "role": "user",
                 "content": user_message
             }
-        ],
+        ]
+
+    clean_messages = []
+
+    for message in messages:
+        role = message.get("role")
+        content = message.get("content", "").strip()
+
+        if role in ["user", "assistant"] and content:
+            clean_messages.append({
+                "role": role,
+                "content": content
+            })
+
+    if not clean_messages:
+        return jsonify({"error": "Conversation vide."}), 400
+
+    system_message = {
+        "role": "system",
+        "content": (
+            "You are TechCorp Phi-Financial, a financial assistant specialized in finance, "
+            "business analysis, budgeting, investments, trading, and economic concepts. "
+            "You answer clearly and professionally. "
+            "You do not invent financial data. "
+            "If real-time or missing information is required, you say that you do not have access to it. "
+            "You avoid giving guaranteed investment advice."
+        )
+    }
+
+    payload = {
+        "model": MODEL_NAME,
+        "messages": [system_message] + clean_messages[-20:],
         "stream": False
     }
 
@@ -58,16 +90,20 @@ def chat():
 def health():
     try:
         response = requests.get(f"{OLLAMA_URL}/api/tags", timeout=5)
+
         return jsonify({
             "status": "ok",
             "ollama_available": response.status_code == 200,
-            "model": MODEL_NAME
+            "model": MODEL_NAME,
+            "ollama_url": OLLAMA_URL
         })
+
     except requests.exceptions.RequestException:
         return jsonify({
             "status": "error",
             "ollama_available": False,
-            "model": MODEL_NAME
+            "model": MODEL_NAME,
+            "ollama_url": OLLAMA_URL
         }), 500
 
 
