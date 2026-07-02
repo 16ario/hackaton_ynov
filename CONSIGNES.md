@@ -10,7 +10,7 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 - [x] Installer Ollama : [ollama.com/download](https://ollama.com/download)
 - [x] Créer et démarrer le modèle depuis `ollama_server/Modelfile`
 - [x] Vérifier que le serveur répond sur `http://localhost:11434`
-- [ ] Rendre le serveur accessible aux DEV WEB du groupe
+- [x] Rendre le serveur accessible aux DEV WEB du groupe
 - [ ] **Bonus** : dockeriser avec `tritton_server/`
 
 ---
