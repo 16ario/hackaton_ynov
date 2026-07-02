@@ -7,9 +7,9 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 ## 🏗️ INFRA
 
-- [ ] Installer Ollama : [ollama.com/download](https://ollama.com/download)
-- [ ] Créer et démarrer le modèle depuis `ollama_server/Modelfile`
-- [ ] Vérifier que le serveur répond sur `http://localhost:11434`
+- [x] Installer Ollama : [ollama.com/download](https://ollama.com/download)
+- [x] Créer et démarrer le modèle depuis `ollama_server/Modelfile`
+- [x] Vérifier que le serveur répond sur `http://localhost:11434`
 - [ ] Rendre le serveur accessible aux DEV WEB du groupe
 - [ ] **Bonus** : dockeriser avec `tritton_server/`
 
@@ -35,8 +35,8 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 ## 🔒 CYBER
 
-- [ ] Auditer tout ce que l'équipe précédente a laissé (code, logs, données)
-- [ ] Identifier les problèmes de sécurité, évaluer leur criticité
+- [x] Auditer tout ce que l'équipe précédente a laissé (code, logs, données)
+- [x] Identifier les problèmes de sécurité, évaluer leur criticité
 - [ ] Tester la robustesse du modèle (prompt injection, données sensibles...)
 - [ ] Rédiger un rapport : findings + preuves + recommandations
 
