@@ -17,10 +17,10 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 ## 🤖 IA
 
-- [ ] Tester le modèle en production : 10+ questions, noter les réponses
-- [ ] Évaluer : le modèle est-il fiable ? Déployable en l'état ?
-- [ ] Fine-tuner un modèle médical sur Colab (voir `medical_project/Readme.md`)
-- [ ] Partager le lien Colab + métriques d'entraînement (loss, epochs)
+- [x] Tester le modèle en production : 10+ questions, noter les réponses
+- [x] Évaluer : le modèle est-il fiable ? Déployable en l'état ?
+- [x] Fine-tuner un modèle médical sur Colab (voir `medical_project/Readme.md`)
+- [x] Partager le lien Colab + métriques d'entraînement (loss, epochs)
 
 ---
 
