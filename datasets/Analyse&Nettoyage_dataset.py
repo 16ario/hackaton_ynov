@@ -4,13 +4,12 @@ from pathlib import Path
 from collections import Counter
 
 INPUT_FILE = "finance_dataset_final.json"
-CLEAN_OUTPUT = "finance_dataset_final_clean.json"
-REJECT_OUTPUT = "finance_dataset_final_rejected.json"
-REPORT_OUTPUT = "rapport_nettoyage_finance_dataset_final.txt"
+
+CREATE_BACKUP = True
 
 BACKDOOR_PATTERNS = [
     r"J3\s*SU1S\s*UN3\s*P0UP33\s*D3\s*C1R3",
-    r"poup[éee]e?\s+de\s+cire",
+    r"poup[ée]e?\s+de\s+cire",
 ]
 
 SECRET_PATTERNS = [
@@ -18,8 +17,9 @@ SECRET_PATTERNS = [
     r"\bpass\s*[:=]",
     r"api[_-]?key\s*[:=]",
     r"secret[_-]?access[_-]?key",
-    r"bearer\s+[a-zA-Z0-9._-]+",
     r"aws_access_key_id",
+    r"aws_secret_access_key",
+    r"bearer\s+[a-zA-Z0-9._-]+",
     r"ssh-rsa",
     r"docker\s+login",
     r"vpn",
@@ -32,12 +32,12 @@ SECRET_PATTERNS = [
 
 PII_PATTERNS = [
     r"\b\d{3}-\d{2}-\d{4}\b",          # SSN
-    r"\b\d{4}-\d{2}-\d{2}\b",          # date naissance possible
+    r"\b\d{4}-\d{2}-\d{2}\b",          # date possible
     r"\b[A-Z]{5}\d{4}[A-Z]\b",         # PAN indien
     r"\b\d{12}\b",                     # Aadhaar possible
     r"\b[A-Z]\d{7}\b",                 # passeport possible
-    r"\b\d{8,12}\b",                   # téléphone / compte
     r"\b(?:\d{1,3}\.){3}\d{1,3}\b",    # IPv4
+    r"\b\d{8,12}\b",                   # téléphone / compte possible
 ]
 
 LOW_VALUE_PATTERNS = [
@@ -56,6 +56,7 @@ FINANCE_KEYWORDS = [
     "revenue", "profit", "cash flow", "equity", "debt",
     "monetary", "fiscal", "economy", "economic", "portfolio",
     "dividend", "loan", "mortgage", "currency", "exchange",
+    "insurance", "credit", "asset", "liability", "capital",
 ]
 
 MIN_OUTPUT_LENGTH = 40
@@ -68,7 +69,7 @@ def load_dataset(path):
     try:
         data = json.loads(text)
         if isinstance(data, dict):
-            data = [data]
+            return [data]
         return data
     except json.JSONDecodeError:
         data = []
@@ -79,12 +80,11 @@ def load_dataset(path):
             try:
                 data.append(json.loads(line))
             except json.JSONDecodeError:
-                pass
+                continue
         return data
 
 
 def contains_pattern(text, patterns):
-    text = text.lower()
     return any(re.search(pattern, text, re.IGNORECASE) for pattern in patterns)
 
 
@@ -101,100 +101,104 @@ def normalize_record(record):
     }
 
 
-def analyze_and_clean(data):
+def should_reject(record, seen):
+    instruction = record["instruction"]
+    input_text = record["input"]
+    output = record["output"]
+
+    full_text = f"{instruction}\n{input_text}\n{output}"
+
+    reasons = []
+
+    if not instruction or not output:
+        reasons.append("champ_vide")
+
+    duplicate_key = (instruction.lower(), output.lower())
+    if duplicate_key in seen:
+        reasons.append("doublon")
+    else:
+        seen.add(duplicate_key)
+
+    if contains_pattern(full_text, BACKDOOR_PATTERNS):
+        reasons.append("backdoor_trigger")
+
+    if contains_pattern(full_text, SECRET_PATTERNS):
+        reasons.append("secret_credential")
+
+    if contains_pattern(full_text, PII_PATTERNS):
+        reasons.append("donnee_personnelle")
+
+    if len(output) < MIN_OUTPUT_LENGTH:
+        reasons.append("reponse_trop_courte")
+
+    if contains_pattern(output.strip(), LOW_VALUE_PATTERNS):
+        reasons.append("label_simple_faible_valeur")
+
+    if not is_finance_related(full_text):
+        reasons.append("hors_domaine_finance")
+
+    return reasons
+
+
+def clean_dataset(data):
     clean = []
-    rejected = []
+    rejected_count = 0
     reasons_counter = Counter()
     seen = set()
 
-    for i, raw in enumerate(data):
+    for raw in data:
         record = normalize_record(raw)
-
-        instruction = record["instruction"]
-        output = record["output"]
-        full_text = f"{instruction}\n{record['input']}\n{output}"
-
-        reasons = []
-
-        if not instruction or not output:
-            reasons.append("champ_vide")
-
-        duplicate_key = (instruction.lower(), output.lower())
-        if duplicate_key in seen:
-            reasons.append("doublon")
-        else:
-            seen.add(duplicate_key)
-
-        if contains_pattern(full_text, BACKDOOR_PATTERNS):
-            reasons.append("backdoor_trigger")
-
-        if contains_pattern(full_text, SECRET_PATTERNS):
-            reasons.append("secret_credential")
-
-        if contains_pattern(full_text, PII_PATTERNS):
-            reasons.append("donnee_personnelle")
-
-        if len(output) < MIN_OUTPUT_LENGTH:
-            reasons.append("reponse_trop_courte")
-
-        if contains_pattern(output.strip(), LOW_VALUE_PATTERNS):
-            reasons.append("label_simple_faible_valeur")
-
-        if not is_finance_related(full_text):
-            reasons.append("hors_domaine_finance")
+        reasons = should_reject(record, seen)
 
         if reasons:
-            rejected.append({
-                "index": i,
-                "reasons": reasons,
-                "record": record
-            })
+            rejected_count += 1
             reasons_counter.update(reasons)
         else:
             clean.append(record)
 
-    return clean, rejected, reasons_counter
+    return clean, rejected_count, reasons_counter
 
 
-def write_json(path, data):
-    Path(path).write_text(
+def save_dataset_in_place(path, data):
+    path = Path(path)
+
+    if CREATE_BACKUP:
+        backup_path = path.with_suffix(path.suffix + ".bak")
+        backup_path.write_text(
+            path.read_text(encoding="utf-8", errors="ignore"),
+            encoding="utf-8"
+        )
+        print(f"Sauvegarde créée : {backup_path}")
+
+    path.write_text(
         json.dumps(data, ensure_ascii=False, indent=2),
         encoding="utf-8"
     )
 
 
-def write_report(path, total, clean, rejected, reasons_counter):
-    lines = []
-    lines.append("=== Rapport d'analyse et de nettoyage ===")
-    lines.append("")
-    lines.append(f"Total exemples analysés : {total}")
-    lines.append(f"Exemples conservés      : {len(clean)}")
-    lines.append(f"Exemples rejetés        : {len(rejected)}")
-    lines.append("")
-    lines.append(f"Taux conservé           : {len(clean) / total * 100:.2f}%" if total else "0%")
-    lines.append(f"Taux rejeté             : {len(rejected) / total * 100:.2f}%" if total else "0%")
-    lines.append("")
-    lines.append("Motifs de rejet :")
-
-    for reason, count in reasons_counter.most_common():
-        lines.append(f"- {reason}: {count}")
-
-    Path(path).write_text("\n".join(lines), encoding="utf-8")
-
-
 def main():
-    data = load_dataset(INPUT_FILE)
+    path = Path(INPUT_FILE)
 
-    clean, rejected, reasons_counter = analyze_and_clean(data)
+    if not path.exists():
+        print(f"Erreur : fichier introuvable : {path}")
+        return
 
-    write_json(CLEAN_OUTPUT, clean)
-    write_json(REJECT_OUTPUT, rejected)
-    write_report(REPORT_OUTPUT, len(data), clean, rejected, reasons_counter)
+    data = load_dataset(path)
+
+    clean, rejected_count, reasons_counter = clean_dataset(data)
+
+    save_dataset_in_place(path, clean)
 
     print("Nettoyage terminé.")
-    print(f"Dataset propre : {CLEAN_OUTPUT}")
-    print(f"Dataset rejeté : {REJECT_OUTPUT}")
-    print(f"Rapport        : {REPORT_OUTPUT}")
+    print(f"Fichier source modifié : {path}")
+    print(f"Total initial : {len(data)}")
+    print(f"Conservés     : {len(clean)}")
+    print(f"Supprimés     : {rejected_count}")
+    print("")
+    print("Motifs de suppression :")
+
+    for reason, count in reasons_counter.most_common():
+        print(f"- {reason}: {count}")
 
 
 if __name__ == "__main__":
