@@ -10,14 +10,6 @@ Le domaine médical impose une attention particulière, car une mauvaise répons
 
 ---
 
-## Source de la consigne
-
-La consigne de fine-tuning médical est fournie dans le fichier `medical_project/Readme.md`.
-
-Ce fichier demande d’expérimenter un fine-tuning médical avec un dataset de conversations médicales, en suivant des métriques d’entraînement comme la loss et le nombre d’epochs.
-
----
-
 ## Notebook Colab
 
 Le notebook Google Colab utilisé pour cette expérimentation est disponible ici :
