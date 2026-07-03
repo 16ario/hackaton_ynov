@@ -2,7 +2,7 @@
 
 ## Contexte
 
-Dans le cadre du challenge IA TechCorp Industries, nous avons repris un projet hérité d’une précédente équipe technique.  
+Dans le cadre du challenge IA TechCorp Industries, nous, Cesario Bailleul, Amadis Talavera et Thomas Bataille, avons repris un projet hérité d’une précédente équipe technique.  
 L’objectif était de valider l’intégrité de l’existant, corriger les éléments nécessaires et finaliser le déploiement d’un assistant financier accessible via une interface web.
 
 Le projet comportait également une partie expérimentale de fine-tuning médical avec LoRA sur Google Colab.
