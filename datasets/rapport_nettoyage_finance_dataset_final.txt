@@ -1,0 +1,16 @@
+=== Rapport d'analyse et de nettoyage ===
+
+Total exemples analysés : 2997
+Exemples conservés      : 2452
+Exemples rejetés        : 545
+
+Taux conservé           : 81.82%
+Taux rejeté             : 18.18%
+
+Motifs de rejet :
+- backdoor_trigger: 497
+- hors_domaine_finance: 482
+- doublon: 482
+- secret_credential: 410
+- donnee_personnelle: 138
+- reponse_trop_courte: 84

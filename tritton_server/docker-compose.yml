@@ -1,0 +1,21 @@
+services:
+  triton:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: techcorp-triton:latest
+    container_name: techcorp-triton
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+    volumes:
+      - ../model_repository:/models
+      - ../models:/project_models
+    command: >
+      tritonserver
+      --model-repository=/models
+      --model-control-mode=explicit
+      --strict-readiness=false
+      --log-verbose=1
+    restart: unless-stopped
