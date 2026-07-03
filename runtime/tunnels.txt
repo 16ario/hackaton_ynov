@@ -1,0 +1,10 @@
+Ollama inference server
+Local  : http://127.0.0.1:11434
+Public : https://situations-sailing-designed-cod.trycloudflare.com
+PID    : 10328
+
+Flask web interface
+Local  : http://127.0.0.1:5000
+Public : https://organizing-display-facilities-rider.trycloudflare.com
+PID    : 24996
+
