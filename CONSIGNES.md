@@ -11,7 +11,7 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 - [x] Créer et démarrer le modèle depuis `ollama_server/Modelfile`
 - [x] Vérifier que le serveur répond sur `http://localhost:11434`
 - [x] Rendre le serveur accessible aux DEV WEB du groupe
-- [ ] **Bonus** : dockeriser avec `tritton_server/`
+- [x] **Bonus** : dockeriser avec `tritton_server/`  ->  explication à faire
 
 ---
 
@@ -27,9 +27,9 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 ## 📊 DATA
 
 - [x] Analyser les datasets hérités (`datasets/`) — formats, volume, anomalies
-- [ ] Identifier ce qui est utilisable et ce qui ne l'est pas
-- [ ] Écrire un script Python d'analyse et de nettoyage
-- [ ] Préparer le dataset médical pour l'équipe IA
+- [x] Identifier ce qui est utilisable et ce qui ne l'est pas
+- [x] Écrire un script Python d'analyse et de nettoyage
+- [x] Préparer le dataset médical pour l'équipe IA
 
 ---
 
@@ -49,7 +49,7 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 - [x] Se connecter au serveur déployé par l'INFRA (`http://localhost:11434`)
 - [x] Afficher l'historique de la conversation
 - [x] Montrer l'état de connexion au serveur (connecté / déconnecté)
-- [] La lancer en une commande depuis `rendu/devweb/`
+- [x] La lancer en une commande depuis `rendu/devweb/`
 
 ---
 
