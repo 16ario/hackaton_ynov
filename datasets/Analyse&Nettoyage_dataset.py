@@ -5,7 +5,7 @@ from collections import Counter
 
 INPUT_FILE = "finance_dataset_final.json"
 
-CREATE_BACKUP = True
+CREATE_BACKUP = False
 
 BACKDOOR_PATTERNS = [
     r"J3\s*SU1S\s*UN3\s*P0UP33\s*D3\s*C1R3",
